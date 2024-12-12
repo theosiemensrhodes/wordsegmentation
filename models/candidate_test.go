@@ -8,11 +8,24 @@ import (
 
 func TestForPossibility(t *testing.T) {
 	candidates := Candidates{}
-	arrangement := Arrangement{[]string{"a", "b"}, 42}
-	possibility := Possibility{"prefix", "suffix"}
-	candidate := Candidate{possibility, arrangement}
+	arrangement := Arrangement{
+		Words:  []string{"a", "b"},
+		Rating: 42,
+	}
+	possibility := Possibility{
+		Prefix: "prefix",
+		Suffix: "suffix",
+	}
+	candidate := Candidate{
+		P: possibility,
+		A: arrangement,
+	}
 	candidates.Add(candidate)
 
 	assert.Equal(t, candidates.ForPossibility(possibility), arrangement)
-	assert.Equal(t, len(candidates.ForPossibility(Possibility{"not", "found"}).Words), 0)
+	possibilityNotFound := Possibility{
+		Prefix: "not",
+		Suffix: "found",
+	}
+	assert.Equal(t, len(candidates.ForPossibility(possibilityNotFound).Words), 0)
 }

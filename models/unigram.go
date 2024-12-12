@@ -11,7 +11,9 @@ type Unigrams struct {
 
 // Create a new Unigrams collection.
 func NewUnigrams() Unigrams {
-	return Unigrams{data: make(map[string]float64)}
+	return Unigrams{
+		data: make(map[string]float64),
+	}
 }
 
 // Add a Unigram to the collection.

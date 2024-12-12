@@ -19,7 +19,9 @@ func (b *Bigram) GetKey() string {
 
 // Create a new collection of bigrams.
 func NewBigrams() Bigrams {
-	return Bigrams{data: make(map[string]float64)}
+	return Bigrams{
+		data: make(map[string]float64),
+	}
 }
 
 // Add another Bigram to the collection.

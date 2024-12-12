@@ -8,7 +8,10 @@ import (
 
 func TestScoreForWord(t *testing.T) {
 	collection := NewUnigrams()
-	unigram := Unigram{"foo", 22}
+	unigram := Unigram{
+		Word:   "foo",
+		Rating: 22,
+	}
 	collection.Add(unigram)
 
 	assert.Equal(t, collection.ScoreForWord(unigram.Word), unigram.Rating)

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	m "github.com/YafimK/wordsegmentation/models"
+	m "github.com/theosiemensrhodes/wordsegmentation/models"
 )
 
 // Parse unigrams from a given TSV file.
@@ -81,7 +81,10 @@ func parseUnigram(jobs <-chan string, results chan<- m.Unigram, wg *sync.WaitGro
 		fields = strings.Split(line, "\t")
 		rating, _ := strconv.ParseFloat(fields[1], 64)
 
-		results <- m.Unigram{fields[0], rating}
+		results <- m.Unigram{
+			Word:   fields[0],
+			Rating: rating,
+		}
 	}
 }
 
@@ -95,7 +98,11 @@ func parseBigram(jobs <-chan string, results chan<- m.Bigram, wg *sync.WaitGroup
 		fields = strings.Split(line, "\t")
 		rating, _ := strconv.ParseFloat(fields[2], 64)
 
-		results <- m.Bigram{fields[0], fields[1], rating}
+		results <- m.Bigram{
+			First:  fields[0],
+			Second: fields[1],
+			Rating: rating,
+		}
 	}
 }
 
