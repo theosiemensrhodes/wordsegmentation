@@ -32,14 +32,15 @@ package main
 import (
     "fmt"
 
-    "github.com/theosiemensrhodes/wordsegmentation"
+    wordseg "github.com/theosiemensrhodes/wordsegmentation"
     "github.com/theosiemensrhodes/wordsegmentation/corpus"
 )
 
 func main() {
     // Grab the default English corpus that will be created thanks to TSV files
     englishCorpus := corpus.NewEnglishCorpus()
-    fmt.Println(wordsegmentation.Segment(englishCorpus, "thisisatest"))
+    segmentor := wordseg.NewSegmentor(englishCorpus)
+    fmt.Println(segmentor.Segment("thisisatest"))
 }
 ```
 
