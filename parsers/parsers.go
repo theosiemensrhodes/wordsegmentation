@@ -4,115 +4,51 @@ import (
 	"bufio"
 	"strconv"
 	"strings"
-	"sync"
 
 	m "github.com/theosiemensrhodes/wordsegmentation/models"
 )
 
 // Parse unigrams from a given TSV file.
-func Unigrams(path string) m.Unigrams {
-	jobs := make(chan string, 5000)
-	results := make(chan m.Unigram, 5000)
+func Unigrams(path string) (m.Unigrams, int) {
+	scanner := bufio.NewScanner(strings.NewReader(path))
 
-	wg := new(sync.WaitGroup)
-	for w := 1; w <= 2; w++ {
-		wg.Add(1)
-		go parseUnigram(jobs, results, wg)
-	}
-
-	go func() {
-		readFile(path, jobs)
-	}()
-
-	// Now collect all the results
-	go func() {
-		wg.Wait()
-		// Make sure we close the result channel when everything was processed
-		close(results)
-	}()
-
-	// Add up the unigrams
 	unigrams := m.NewUnigrams()
-	for b := range results {
-		unigrams.Add(b)
+	var maxWordLength int
+	var fields []string
+	for scanner.Scan() {
+		fields = strings.Split(scanner.Text(), "\t")
+		rating, _ := strconv.ParseFloat(fields[1], 64)
+
+		u := m.Unigram{
+			Word:   fields[0],
+			Rating: rating,
+		}
+		unigrams.Add(u)
+
+		if len(u.Word) > maxWordLength {
+			maxWordLength = len(u.Word)
+		}
 	}
 
-	return unigrams
+	return unigrams, maxWordLength
 }
 
 // Parse bigrams from a given TSV file.
 func Bigrams(path string) m.Bigrams {
-	jobs := make(chan string, 5000)
-	results := make(chan m.Bigram, 5000)
+	scanner := bufio.NewScanner(strings.NewReader(path))
 
-	wg := new(sync.WaitGroup)
-	for w := 1; w <= 2; w++ {
-		wg.Add(1)
-		go parseBigram(jobs, results, wg)
-	}
-
-	go func() {
-		readFile(path, jobs)
-	}()
-
-	// Now collect all the results
-	go func() {
-		wg.Wait()
-		// Make sure we close the result channel when everything was processed
-		close(results)
-	}()
-
-	// Add up the bigrams
 	bigrams := m.NewBigrams()
-	for b := range results {
-		bigrams.Add(b)
-	}
-
-	return bigrams
-}
-
-// Parse a unigram.
-func parseUnigram(jobs <-chan string, results chan<- m.Unigram, wg *sync.WaitGroup) {
-	defer wg.Done()
 	var fields []string
-
-	for line := range jobs {
-		fields = nil
-		fields = strings.Split(line, "\t")
-		rating, _ := strconv.ParseFloat(fields[1], 64)
-
-		results <- m.Unigram{
-			Word:   fields[0],
-			Rating: rating,
-		}
-	}
-}
-
-// Parse a bigram.
-func parseBigram(jobs <-chan string, results chan<- m.Bigram, wg *sync.WaitGroup) {
-	defer wg.Done()
-	var fields []string
-
-	for line := range jobs {
-		fields = nil
-		fields = strings.Split(line, "\t")
+	for scanner.Scan() {
+		fields = strings.Split(scanner.Text(), "\t")
 		rating, _ := strconv.ParseFloat(fields[2], 64)
 
-		results <- m.Bigram{
+		bigrams.Add(m.Bigram{
 			First:  fields[0],
 			Second: fields[1],
 			Rating: rating,
-		}
+		})
 	}
-}
 
-// Read a file and put the content in a channel.
-func readFile(path string, jobs chan<- string) chan<- string {
-	scanner := bufio.NewScanner(strings.NewReader(path))
-	for scanner.Scan() {
-		jobs <- scanner.Text()
-	}
-	close(jobs)
-
-	return jobs
+	return bigrams
 }

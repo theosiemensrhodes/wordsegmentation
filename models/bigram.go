@@ -1,7 +1,5 @@
 package models
 
-import "fmt"
-
 type Bigram struct {
 	First  string
 	Second string
@@ -9,18 +7,18 @@ type Bigram struct {
 }
 
 type Bigrams struct {
-	data map[string]float64
+	data map[[2]string]float64
 }
 
 // Get a unique identifier for a Bigram.
-func (b *Bigram) GetKey() string {
-	return fmt.Sprintf("%s#%s", b.First, b.Second)
+func (b *Bigram) GetKey() [2]string {
+	return [2]string{b.First, b.Second}
 }
 
 // Create a new collection of bigrams.
 func NewBigrams() Bigrams {
 	return Bigrams{
-		data: make(map[string]float64),
+		data: make(map[[2]string]float64),
 	}
 }
 
