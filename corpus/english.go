@@ -1,8 +1,11 @@
 package corpus
 
 import (
+	"regexp"
+	"strings"
+
+	"github.com/kennygrant/sanitize"
 	"github.com/theosiemensrhodes/wordsegmentation/data/english"
-	help "github.com/theosiemensrhodes/wordsegmentation/helpers"
 	m "github.com/theosiemensrhodes/wordsegmentation/models"
 	"github.com/theosiemensrhodes/wordsegmentation/parsers"
 )
@@ -58,5 +61,6 @@ func (corpus *EnglishCorpus) MaxWordLength() int {
 
 // Clean a string from special characters.
 func (corpus *EnglishCorpus) Clean(s string) string {
-	return help.CleanString(s)
+	s = sanitize.Accents(strings.ToLower(s))
+	return regexp.MustCompile("[^a-zA-Z0-9]+").ReplaceAllString(s, "")
 }
